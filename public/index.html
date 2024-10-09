@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domestika courses backup 💾</title>
+  <link rel="shortcut icon" href="assets/img/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles2.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="bg-slate-300">
+  <header>
+    <nav class="flex items-center space-x-3">
+      <img class="w-8 h-8" src="assets/img/favicon.ico">
+      <a class="text-blue-100" href="https://www.domestika.org/es">DOMESTIKA</a>
+    </nav>
+  </header>
+
+  <main class="flex">
+    <div class=" w-2/4 p-4">
+      <h1>Domestika courses backup 💾</h1>
+      <hr>
+      <form id="form" class="flex flex-col space-y-4">
+        <label for="url">URL</label>
+        <input type="text" id="url" name="url" class="p-2 rounded-md shadow-xl">
+        <label for="domestika_session">domestika_session</label>
+        <input type="text" id="domestika_session" name="domestika_session" class="p-2 rounded-md shadow-xl">
+        <label for="_credentials">_credentials</label>
+        <input type="text" id="_credentials" name="_credentials" class="p-2 rounded-md shadow-xl">
+        <button type="submit"
+          class="bg-blue-400 text-white px-2 py-2 rounded-full hover:bg-blue-600 shadow-2xl ">Download</button>
+      </form>
+
+    </div>
+
+    <aside class="w-1/4 p4 bg-gray-600 text-cyan-100 ">
+
+      <p>
+        Instruccions:
+
+      </p>
+      ----
+      <p>
+        The course_url is just the full URL of the course you want to download. For example:
+        https://www.domestika.org/en/courses/3086-creating-animated-stories-with-after-effects/course
+
+      </p>
+      ----
+      <p>
+        IMPORTANT: you have to be on the "content" page. You know you are on the right site when at the end of the URL
+        it
+        says "/course".
+      </p>
+      ----
+      <p>
+        To get the domestika_session and the _credentials you will need to install a chrome extension called
+        Cookie-Editor
+        <a href="https://cookie-editor.com/" target="_blank" rel="noopener noreferrer">
+          <button class=" flex bg-gray-800 text-white px-2 py-2 rounded-full hover:bg-blue-400"><img class="w-6 h-6"
+              src="assets/img/cookie-filled.svg">Get cookie-editor</button>
+        </a>
+      </p>
+      ----
+      <p>
+        After you installed the extension, log into domestika and open the extension.
+      </p>
+      ----
+      <p>
+        In the window popup, look for "_domestika_session", click to open it and copy the contents of the Value field
+        into the field domestika_session (to the left of this panel).
+      </p>
+      ----
+      <p>
+        then look for the "credentials" cookie, copy the value of that into the "_credentials" field (to the left of
+        this
+        panel).
+      </p>
+
+      ----
+      <p>
+        Click on the download button and wait for the download to start.
+      </p>
+    </aside>
+
+  </main>
+  <footer>
+
+  </footer>
+  <script src="app.js"></script>
+</body>
+
+</html>

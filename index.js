@@ -8,20 +8,20 @@ const fs = require('fs');
 const debug = false;
 const debug_data = [];
 
-const course_url = 'YOUR_COURSE_URL_HERE';
-const subtitle_lang = 'en';
+const course_url = 'https://www.domestika.org/es/courses/521-ilustracion-para-proyectos-de-animacion-y-videojuegos/course';
+const subtitle_lang = 'es';
 
 //Cookie used to retreive video information
 const cookies = [
     {
         name: '_domestika_session',
-        value: 'YOUR_COOKIE_HERE',
+        value: 'D06uysY3CQfsLjeuDP4H5VSl7XSV7rZPUjSlK8GN8F%2B0db00OojR0Tr1dosmzM1VjfoZp5nglYfwXeg8SbwUR4PrnByi03BcFwlJ7OAxvxVEqJLHnyAK51c2TL%2BdSh%2BxtmJcc3l3iWn%2B2OqmLiImC9rjxCr2y1LdEcP%2FRkLEWD7zdbT5UqAlcrBGgwgPTNwKqhGuqiEDHMFDn4dm%2BMpgY9VHYvbBO8gXEhn4U32%2FJtqAS6UsEt%2BWU9Yr2RK5GL%2BrOY7SWS0WLRAjKiwMO%2FuL4I7lDBVJr%2FhVvOgFbB0X4EGO9dpDDkfV7BfBFxP%2BdCslpMYSfT0yw%2F111XRVMAU1v3S7ZgRbg8i0TM2thtU3gMUpx%2BIfIylm3bkb0fySmo4ZMzEybI%2BYr0h7YaMg4mCdoE9j47j5aqj3COtuQ4x9fnz5DrX%2FBYYXPqZQkRouNu2b1mi2ciCp0Kh70Lr3JZFnhFa4xAQo1AcBBoIpkHoPYIDWGKTjpxeRr6wQ%2FGi2YbAXLfKEmkBW7ZBIQznADKM4kwIm7pjQX3xLoPew8vDb4eQcHIouUN2XdA9%2BiIyUWgJZFS62WE8U--1EAlcbOEmpI%2BuyD7--SOEoNqWYLnqHjrCjv7ty1w%3D%3D',
         domain: 'www.domestika.org',
     },
 ];
 
 //Credentials needed for the access token to get the final project
-const _credentials_ = 'YOUR_CREDENTIALS_HERE';
+const _credentials_ = '{%22accessToken%22:%22w9FOLWrDkiRcxGd53OM_MIfjuJpDstpyZbAb1gn18j4%22%2C%22refreshToken%22:%22SfxJ76zLJyYYgxvWZXq0WcDnUtZ3nNsXXDQABgyCKbk%22%2C%22isEmpty%22:false}';
 // --- END CONFIGURATION ---
 
 //Check if the N_m3u8DL-RE.exe exists, throw error if not
