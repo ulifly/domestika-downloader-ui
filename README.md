@@ -1,5 +1,11 @@
 # Node JS Tool to download full courses from Domestika
 
+# Notice and credits
+the original work belongs to this repository https://github.com/ReneR97/domestika-downloader
+and this person https://github.com/UXCorpRangel/
+
+i just added a server and the UI
+
 This script is a simple way to download a full course from Domestika.
 
 > **Warning**
