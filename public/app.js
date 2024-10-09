@@ -34,7 +34,7 @@ document.getElementById('form').addEventListener('submit', function(event) {
     domestika_session: session,
     _credentials: credentials
   };
-
+  informationConsole.innerHTML = '<img class="w-12 h-12 " src="assets/img/loading.gif"> <p>Downloading videos, please wait...</p>';
 
     // send the data to the server
     fetch('/api/submit', {
@@ -51,9 +51,17 @@ document.getElementById('form').addEventListener('submit', function(event) {
       return response.json();
     })
     .then(data => {
+      console.log(data);
       alert(data.message);
+      const informationConsole = document.getElementById('informationConsole');
+      informationConsole.innerHTML = '';
       if (data.logs) {
-        data.logs.forEach(log => alert(log)); // Mostrar cada mensaje de log en un alert
+        console.log(data.logs);
+        data.logs.forEach(log => {
+          const logElement = document.createElement('p');
+          logElement.textContent = log;
+          informationConsole.appendChild(logElement);
+        });
       }
     })
     .catch((error) => {

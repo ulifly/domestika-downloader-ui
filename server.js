@@ -8,6 +8,7 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const fs = require('fs');
 const { url } = require('inspector');
+const { log } = require('console');
 
 
 // --- CONFIGURATION ---
@@ -25,7 +26,7 @@ let access_token
 const cookies = [
     {
         name: '_domestika_session',
-        value: 'YOUR_COOKIE_HERE', //TODO: change this to blank
+        value: '', 
         domain: 'www.domestika.org',
     },
 ];
@@ -50,7 +51,7 @@ app.get('/', (req, res) => {
 });
 
 // Ruta para manejar la solicitud POST
-app.post('/api/submit', (req, res) => {
+app.post('/api/submit', async (req, res) => {
   const { url, domestika_session, _credentials } = req.body;
   console.log('Received data:', { url, domestika_session, _credentials });
 
@@ -60,18 +61,17 @@ app.post('/api/submit', (req, res) => {
       cookies[0].value = domestika_session;
   
       console.log('Updated configuration:', { course_url, _credentials_, cookies });
-
+      let logMessages = [];
 
       try {
-        procesData();
-        res.json({ message: 'Data received' });
+        logMessages = await processData();
+        console.log({ message: 'Data received xxx', logs: logMessages });
+        res.json({ message: 'finished', logs: logMessages });
       } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.log({ message: error.message, logs: logMessages });
+        res.status(500).json({ message: error.message, logs: logMessages });
       }
 });
-
-
-
 
 
 server.listen(PORT, () => {
@@ -79,22 +79,27 @@ server.listen(PORT, () => {
 });
 //**---------------- */
 
-function procesData () {
+async function processData () {
+  let logMessages = [];
+
   //Get access token from the credentials
  access_token = regex_token.exec(decodeURI(_credentials_))[1];
 
   //Check if the N_m3u8DL-RE.exe exists, throw error if not
 if (fs.existsSync('N_m3u8DL-RE.exe')) {
-  scrapeSite();
+    logMessages.push('N_m3u8DL-RE.exe found');
+    logMessages = logMessages.concat(await scrapeSite());
 } else {
   throw new Error('N_m3u8DL-RE.exe not found! Download the Binary here: https://github.com/nilaoda/N_m3u8DL-RE/releases');
 }
-  
+  return logMessages;
 }
 
 
 
 async function scrapeSite() {
+    let logMessages = [];
+
   //Scrape site for links to videos
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
@@ -116,6 +121,7 @@ async function scrapeSite() {
   const $ = cheerio.load(html);
 
   console.log('Scraping Site');
+  logMessages.push('Scraping Site');
 
   let allVideos = [];
   let units = $('h4.h2.unit-item__title a');
@@ -151,7 +157,9 @@ async function scrapeSite() {
       }
   });
 
-  console.log(units.length + ' Units Detected');
+  let unitsDetectedMessage = `${units.length} Units Detected`;
+  logMessages.push(unitsDetectedMessage);
+  console.log(unitsDetectedMessage);
 
   //Get all the links to the m3u8 files
   for (let i = 0; i < units.length; i++) {
@@ -168,10 +176,12 @@ async function scrapeSite() {
 
       totalVideos += videoData.length;
   }
-
+  
+  logMessages.push('All Videos Found');
   console.log('All Videos Found');
 
   if (final_project_id != undefined && final_project_id != null) {
+      logMessages.push('Fetching Final Project');
       console.log('Fetching Final Project');
       let final_data = await fetchFromApi(`https://api.domestika.org/api/courses/${final_project_id}/final-project?with_server_timing=true`, 'finalProject.v1', access_token);
 
@@ -200,7 +210,9 @@ async function scrapeSite() {
           downloadPromises.push(downloadVideo(vData, title, unit.title, a));
 
           count++;
-          console.log(`Download ${count}/${totalVideos} Started`);
+          let downloadMessage = `Download ${count}/${totalVideos} Started`;
+          logMessages.push(downloadMessage);
+          console.log(downloadMessage);
       }
   }
 
@@ -212,10 +224,12 @@ async function scrapeSite() {
 
   if (debug) {
       fs.writeFileSync('log.json', JSON.stringify(debug_data));
+      logMessages.push('Log File Saved');
       console.log('Log File Saved');
   }
-
+  logMessages.push('All Videos Downloaded');
   console.log('All Videos Downloaded');
+  return logMessages;
 }
 
 
@@ -265,7 +279,7 @@ async function fetchFromApi(apiURL, accept_version, access_token) {
   });
 
   if (!response.ok) {
-      console.log('Error Fetching Data, check the credentials are still valid.');
+      console.log('Error Fetching Data, check the credentials are still valid.');//TODO change this to send to frontend
       return false;
   }
 
