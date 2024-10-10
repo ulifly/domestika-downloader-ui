@@ -20,6 +20,18 @@
 //   }
 // })
 
+document.addEventListener('DOMContentLoaded', () => {
+  const socket = io(); 
+
+  socket.on('log', (data) => {
+    const informationConsole = document.getElementById('informationConsole');
+    const logElement = document.createElement('p');
+    logElement.textContent = data.message;
+    informationConsole.appendChild(logElement);
+  });
+})
+
+
 document.getElementById('form').addEventListener('submit', function(event) {
   event.preventDefault(); 
 
@@ -35,6 +47,9 @@ document.getElementById('form').addEventListener('submit', function(event) {
     _credentials: credentials
   };
 
+  
+  informationConsole.innerHTML = document.getElementById('informationConsole').innerHTML 
+  informationConsole.innerHTML ='<div class = "flex items-center space-x-6 text-white p-2 rounded-md shadow-xl" > <img class="w-12 h-12 " src="assets/img/loading.gif"> <p>Downloading videos, please wait...</p> </div>';
 
     // send the data to the server
     fetch('/api/submit', {
@@ -51,13 +66,30 @@ document.getElementById('form').addEventListener('submit', function(event) {
       return response.json();
     })
     .then(data => {
+      console.log(data);
       alert(data.message);
-      if (data.logs) {
-        data.logs.forEach(log => alert(log)); // Mostrar cada mensaje de log en un alert
-      }
     })
     .catch((error) => {
       console.error('Error:', error);
-      alert('Err.' + error.message);
+      alert('Error: ' + error.message);
     });
+
+    // .then(data => {
+    //   console.log(data);
+    //   alert(data.message);
+    //   const informationConsole = document.getElementById('informationConsole');
+    //   informationConsole.innerHTML = '';
+    //   if (data.logs) {
+    //     console.log(data.logs);
+    //     data.logs.forEach(log => {
+    //       const logElement = document.createElement('p');
+    //       logElement.textContent = log;
+    //       informationConsole.appendChild(logElement);
+    //     });
+    //   }
+    // })
+    // .catch((error) => {
+    //   console.error('Error:', error);
+    //   alert('Err.' + error.message);
+    // });
 });
