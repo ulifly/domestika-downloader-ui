@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require('express');
 const { createServer } = require('http');
+const { Server } = require('socket.io');
 
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
@@ -39,6 +40,7 @@ const PORT = 5001;
 
 const app = express();
 const server = createServer(app);
+const io = new Server(server);
 
 // Middleware para parsear el cuerpo de las solicitudes como JSON
 app.use(express.json());
@@ -61,15 +63,13 @@ app.post('/api/submit', async (req, res) => {
       cookies[0].value = domestika_session;
   
       console.log('Updated configuration:', { course_url, _credentials_, cookies });
-      let logMessages = [];
 
       try {
-        logMessages = await processData();
-        console.log({ message: 'Data received xxx', logs: logMessages });
-        res.json({ message: 'finished', logs: logMessages });
+        await processData();
+        res.json({ message: 'finished'});
       } catch (error) {
-        console.log({ message: error.message, logs: logMessages });
-        res.status(500).json({ message: error.message, logs: logMessages });
+        console.log({ message: error.message });
+        res.status(500).json({ message: error.message });
       }
 });
 
@@ -79,26 +79,47 @@ server.listen(PORT, () => {
 });
 //**---------------- */
 
-async function processData () {
-  let logMessages = [];
 
-  //Get access token from the credentials
- access_token = regex_token.exec(decodeURI(_credentials_))[1];
 
-  //Check if the N_m3u8DL-RE.exe exists, throw error if not
-if (fs.existsSync('N_m3u8DL-RE.exe')) {
-    logMessages.push('N_m3u8DL-RE.exe found');
-    logMessages = logMessages.concat(await scrapeSite());
-} else {
-  throw new Error('N_m3u8DL-RE.exe not found! Download the Binary here: https://github.com/nilaoda/N_m3u8DL-RE/releases');
+
+//**---------socket io connection ---------- */
+
+io.on('connection', (socket) => {
+    console.log('a user connected');
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+});
+
+function sendEvent(data) {
+    io.emit('log', data);
 }
-  return logMessages;
+
+//**---------------- */
+
+
+
+
+
+
+async function processData () {
+    //Get access token from the credentials
+   access_token = regex_token.exec(decodeURI(_credentials_))[1];
+  
+    //Check if the N_m3u8DL-RE.exe exists, throw error if not
+  if (fs.existsSync('N_m3u8DL-RE.exe')) {
+      sendEvent({ message: ' N_m3u8DL-RE.exe found' });
+      await scrapeSite();
+      sendEvent({ message: 'All Videos Downloaded' });
+  } else {
+    sendEvent({ message: 'N_m3u8DL-RE.exe not found! Download the Binary here: https://github.com/nilaoda/N_m3u8DL-RE/releases'});
+    throw new Error('N_m3u8DL-RE.exe not found! Download the Binary here: https://github.com/nilaoda/N_m3u8DL-RE/releases');
+  }
 }
 
 
 
 async function scrapeSite() {
-    let logMessages = [];
 
   //Scrape site for links to videos
   const browser = await puppeteer.launch({ headless: true });
@@ -121,7 +142,7 @@ async function scrapeSite() {
   const $ = cheerio.load(html);
 
   console.log('Scraping Site');
-  logMessages.push('Scraping Site');
+  sendEvent({ message: 'Scraping Site' });
 
   let allVideos = [];
   let units = $('h4.h2.unit-item__title a');
@@ -158,7 +179,7 @@ async function scrapeSite() {
   });
 
   let unitsDetectedMessage = `${units.length} Units Detected`;
-  logMessages.push(unitsDetectedMessage);
+  sendEvent({ message: unitsDetectedMessage });
   console.log(unitsDetectedMessage);
 
   //Get all the links to the m3u8 files
@@ -177,11 +198,11 @@ async function scrapeSite() {
       totalVideos += videoData.length;
   }
   
-  logMessages.push('All Videos Found');
+  sendEvent({ message: 'All Videos Found' });
   console.log('All Videos Found');
 
   if (final_project_id != undefined && final_project_id != null) {
-      logMessages.push('Fetching Final Project');
+      sendEvent({ message: 'Fetching Final Project' });
       console.log('Fetching Final Project');
       let final_data = await fetchFromApi(`https://api.domestika.org/api/courses/${final_project_id}/final-project?with_server_timing=true`, 'finalProject.v1', access_token);
 
@@ -211,7 +232,7 @@ async function scrapeSite() {
 
           count++;
           let downloadMessage = `Download ${count}/${totalVideos} Started`;
-          logMessages.push(downloadMessage);
+          sendEvent({ message: downloadMessage });
           console.log(downloadMessage);
       }
   }
@@ -224,12 +245,12 @@ async function scrapeSite() {
 
   if (debug) {
       fs.writeFileSync('log.json', JSON.stringify(debug_data));
-      logMessages.push('Log File Saved');
+      sendEvent({ message: 'Log File Saved' });
       console.log('Log File Saved');
   }
-  logMessages.push('All Videos Downloaded');
+  sendEvent({ message: 'All Videos Downloaded' });
   console.log('All Videos Downloaded');
-  return logMessages;
+  
 }
 
 
@@ -256,7 +277,7 @@ async function getInitialProps(url, page) {
               title: el.video.title.replaceAll('.', '').trim(),
               section: section,
           });
-
+          sendEvent({ message: 'Video Found: ' + el.video.title });
           console.log('Video Found: ' + el.video.title);
       }
   }

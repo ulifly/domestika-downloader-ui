@@ -14,7 +14,9 @@
         "cheerio": "^1.0.0-rc.12",
         "express": "^4.21.0",
         "nodemon": "^3.1.7",
-        "puppeteer": "^19.6.3"
+        "puppeteer": "^19.6.3",
+        "socket.io": "^4.8.0",
+        "socket.io-client": "^4.8.0"
     },
     "devDependencies": {
         "tailwindcss": "^3.4.13"
