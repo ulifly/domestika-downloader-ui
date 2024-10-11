@@ -1,16 +1,16 @@
-const path = require('path');
-const express = require('express');
-const { createServer } = require('http');
-const { Server } = require('socket.io');
+import path from 'path';
+import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import puppeteer from 'puppeteer';
+import cheerio from 'cheerio';
+import { promisify } from 'util';
+import { exec as execCallback } from 'child_process';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import open from 'open';
 
-const puppeteer = require('puppeteer');
-const cheerio = require('cheerio');
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
-const fs = require('fs');
-const { url } = require('inspector');
-const { log } = require('console');
-
+const exec = promisify(execCallback);
 
 // --- CONFIGURATION ---
 const debug = false;
@@ -45,7 +45,10 @@ const io = new Server(server);
 // Middleware para parsear el cuerpo de las solicitudes como JSON
 app.use(express.json());
 
-app.use(express.static("public"));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(express.static(path.join(__dirname, "public")));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname,"public", "index.html"));
@@ -76,6 +79,7 @@ app.post('/api/submit', async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`server running at http://localhost:${PORT}`);
+  open(`http://localhost:${PORT}`);
 });
 //**---------------- */
 
@@ -248,7 +252,7 @@ async function scrapeSite() {
       sendEvent({ message: 'Log File Saved' });
       console.log('Log File Saved');
   }
-  sendEvent({ message: 'All Videos Downloaded' });
+  //sendEvent({ message: 'All Videos Downloaded' });
   console.log('All Videos Downloaded');
   
 }
@@ -333,6 +337,7 @@ async function downloadVideo(vData, title, unitTitle, index) {
           });
       }
   } catch (error) {
+      sendEvent({ message: `Error downloading video: ${error}` });
       console.error(`Error downloading video: ${error}`);
   }
 }

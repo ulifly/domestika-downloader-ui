@@ -1,24 +1,36 @@
-// Swal.fire({
-//   title: 'Disclaimer',
-//   text: 'this piece of software is for educational purposes only. Do not use this software to download content that you do not have the rights to download. By clicking "I Agree" you agree to use this software responsibly and in accordance with the law.',
-//   icon: 'warning',
-//   showDenyButton: true,
-//   showCancelButton: false,
-//   confirmButtonText: 'I Agree',
-//   denyButtonText: 'I Disagree',
-// }).then((result) => {
-//   if (result.isConfirmed) {
-//     Swal.fire('Thank you for agreeing to the disclaimer.', '', 'success')
-//   } else if (result.isDenied) {
-//     Swal.fire({
-//       title: 'Close this now.',
-//       icon: 'info',
-//       confirmButtonText: 'OK'
-//     }).then(() => {
-//       window.close();
-//     });
-//   }
-// })
+const Toast = Swal.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.onmouseenter = Swal.stopTimer;
+    toast.onmouseleave = Swal.resumeTimer;
+  }
+});
+
+Swal.fire({
+  title: 'Disclaimer',
+  text: 'this piece of software is for educational purposes only. Do not use this software to download content that you do not have the rights to download. By clicking "I Agree" you agree to use this software responsibly and in accordance with the law.',
+  icon: 'warning',
+  showDenyButton: true,
+  showCancelButton: false,
+  confirmButtonText: 'I Agree',
+  denyButtonText: 'I Disagree',
+}).then((result) => {
+  if (result.isConfirmed) {
+    Swal.fire('Thank you for agreeing to the disclaimer.', '', 'success')
+  } else if (result.isDenied) {
+    Swal.fire({
+      title: 'Close this now.',
+      icon: 'info',
+      confirmButtonText: 'OK'
+    }).then(() => {
+      window.close();
+    });
+  }
+})
 
 document.addEventListener('DOMContentLoaded', () => {
   const socket = io(); 
@@ -67,29 +79,18 @@ document.getElementById('form').addEventListener('submit', function(event) {
     })
     .then(data => {
       console.log(data);
-      alert(data.message);
+      Toast.fire({
+        icon: "success",
+        title: data.message
+      });
+      //alert(data.message);
     })
     .catch((error) => {
       console.error('Error:', error);
-      alert('Error: ' + error.message);
+     //alert('Error: ' + error.message);
+     Toast.fire({
+      icon: "warning",
+      title: "Error: " + error.message
     });
-
-    // .then(data => {
-    //   console.log(data);
-    //   alert(data.message);
-    //   const informationConsole = document.getElementById('informationConsole');
-    //   informationConsole.innerHTML = '';
-    //   if (data.logs) {
-    //     console.log(data.logs);
-    //     data.logs.forEach(log => {
-    //       const logElement = document.createElement('p');
-    //       logElement.textContent = log;
-    //       informationConsole.appendChild(logElement);
-    //     });
-    //   }
-    // })
-    // .catch((error) => {
-    //   console.error('Error:', error);
-    //   alert('Err.' + error.message);
-    // });
+    });
 });
